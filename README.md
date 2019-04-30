@@ -77,17 +77,32 @@ with the following:
 ```
 public void longRunningMethod() {
   try (ThreadsSampler ts = new ThreadsSampler) {
-    ts.setMonitoredPackages("com.imperva,com.impv");
+    ts.setMonitoredPackages("com.imperva,com.mprv");
     ts.setReportFrequencySeconds(0);
     ts.setSamplingFrequencyMillis(25L);
-    ts.setReportZeroTimePackages(Thread.currentThread());
-    ts.setSkipDaemonThreads(true);
+    ts.setThreadToBeSampled(Thread.currentThread());
     ts.setActive(true);
     ts.init();
     some code;
   } catch (IOException ioe) {}
 }
 ```
-#### To sample the entire process and report every 10 minutes as a Spring bean
+
+#### To direct sampler output to a file
+Add the following before calling `ts.init()` method:
 ```
-<bean id=
+ts.setSamplingOutputer(new PrintStreamSamplingOutputer("/your/log/directory/file.log"));
+```
+
+#### To sample the entire process, report every 10 minutes, and direct output to Logger while using Spring IOC
+```
+<bean id="samplingOutputer" class="com.incapsula.sampler.outputer.LoggerSamplingOutputer" scope="singleton" />
+<bean id="threasSampler" class="com.incapsula.sampler.ThreadsSampler" scope="singleton" init-method="init">
+  <property name="monitoredPackages" value="com.imperva,com.mprv" />
+  <property name="reportFrequencySeconds" value="600" />
+  <property name="samplingFrequencyMillis" value="25" />
+  <property name="skipDaemonThreads" value="true" />
+  <property name="active" value="true" />
+  <property name="samplingOutputer" ref="samplingOutputer" />
+</bean>
+```
