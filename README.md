@@ -11,7 +11,7 @@ Of course, not all the accounted time was actually spent that arbirary method. H
 
 Sampling overhead linearly depends on sampling frequency. Intuitively, you should expect accuracy to be impacted when frequency is lowered. In practice, accuracy depends solely on the amount of samples. 1000 samples are more than enough for most use cases. So, lowering sampling does not impact accuracy. It just takes more time to have enough samples.
 
-### caveats
+### Caveats
 What sampling cannot tell is how many times a method was invoked. In the above example (specific method is responsible for 10 seconds) a sampler cannot tell if it was: 
 - Executed 200 times with average duration of 50ms.
 - Executed 20,000 times with average duration of 0.5ms.
