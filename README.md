@@ -34,4 +34,60 @@ In most cases, you are interested in your application code only. E.g. when your 
 
 You should specify a list of package prefixes that will be considered as "interesting". Whenever the top method in the stack trace not an interesting one, the next methods will be checked until an interesting one is found. 
 
-Additional 
+Additional filtering is done during reporting time. It elimininates methods with zero "Method time" and single child method.
+
+### Sampler output
+By default, the sampler reports the aggregated performance data every 15 minutes. You may change reporting interval. If zero, a single report is outputed at sampler's shutdown.
+
+Each report interval contains its timeframe plus one aggreagted invocation tree per aggregated (manipulated) thread name. 
+
+Please, don't miss the horizontal scroll in the following example:
+```
+java.lang.Thread.run(Thread.java:744)                                                                                                                   Cumulative time(ms): 250169, Method time(ms): 0
+  models.site.SiteCustomRule.updateRulesRequestsCount(SiteCustomRule.java:646)                                                                          Cumulative time(ms): 248, Method time(ms): 0
+    play.db.jpa.GenericModel$JPAQuery.fetch(GenericModel.java:380)                                                                                      Cumulative time(ms): 248, Method time(ms): 248
+  models.site.SiteCustomRule.updateRulesRequestsCount(SiteCustomRule.java:664)                                                                          Cumulative time(ms): 5895, Method time(ms): 0
+    models.site.SiteCustomRule.find(SiteCustomRule.java)                                                                                                Cumulative time(ms): 250, Method time(ms): 0
+      play.db.jpa.JPQL.find(JPQL.java:54)                                                                                                               Cumulative time(ms): 200, Method time(ms): 200
+      play.db.jpa.JPQL.find(JPQL.java:56)                                                                                                               Cumulative time(ms): 50, Method time(ms): 50
+    play.classloading.enhancers.PropertiesEnhancer$FieldAccessor.invokeReadProperty(PropertiesEnhancer.java:255)                                        Cumulative time(ms): 100, Method time(ms): 100
+    play.classloading.enhancers.PropertiesEnhancer$FieldAccessor.invokeReadProperty(PropertiesEnhancer.java:260)                                        Cumulative time(ms): 101, Method time(ms): 101
+    play.db.jpa.GenericModel$JPAQuery.first(GenericModel.java:340)                                                                                      Cumulative time(ms): 5444, Method time(ms): 5444
+  models.site.SiteCustomRule.updateRulesRequestsCount(SiteCustomRule.java:667)                                                                          Cumulative time(ms): 244026, Method time(ms): 0
+    play.db.jpa.GenericModel.validateAndSave(GenericModel.java:188)                                                                                     Cumulative time(ms): 3634, Method time(ms): 3634
+    play.db.jpa.GenericModel.validateAndSave(GenericModel.java:189)                                                                                     Cumulative time(ms): 240392, Method time(ms): 0
+      models.attributes.AttributeModel.save(AttributeModel.java:100)                                                                                    Cumulative time(ms): 50, Method time(ms): 0
+        play.classloading.enhancers.PropertiesEnhancer$FieldAccessor.invokeReadProperty(PropertiesEnhancer.java:255)                                    Cumulative time(ms): 50, Method time(ms): 50
+      models.attributes.AttributeModel.save(AttributeModel.java:99)                                                                                     Cumulative time(ms): 240342, Method time(ms): 0
+        play.db.jpa.GenericModel.save(GenericModel.java:206)                                                                                            Cumulative time(ms): 240342, Method time(ms): 240342
+ ```
+### Usage
+1. Allocate a new ThreadsSampler.
+2. Call its appropriate setter methods.
+3. Call its init() method to start sampling.
+4. Call its close() method or use JAVA 7 AutoCloseable try block to stop and report.
+
+#### To sample a specific long running method, you may replace 
+```
+public void longRunningMethod() {
+  some code;
+}
+```
+with the following:
+```
+public void longRunningMethod() {
+  try (ThreadsSampler ts = new ThreadsSampler) {
+    ts.setMonitoredPackages("com.imperva,com.impv");
+    ts.setReportFrequencySeconds(0);
+    ts.setSamplingFrequencyMillis(25L);
+    ts.setReportZeroTimePackages(Thread.currentThread());
+    ts.setSkipDaemonThreads(true);
+    ts.setActive(true);
+    ts.init();
+    some code;
+  } catch (IOException ioe) {}
+}
+```
+#### To sample the entire process and report every 10 minutes as a Spring bean
+```
+<bean id=
