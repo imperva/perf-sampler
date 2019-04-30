@@ -28,4 +28,10 @@ Aggregation is done based on thread name. Meaningful thread naming is key to eas
 
 A thread name manipulator is invoked for each thread every sample. The default thread name manipulator removes digits from thread name. It assumes that parallel worker threads of same executor will share a common prefix and we want aggregate the entire set of worker threads as one.
 
-You may write your own thread name manipulator to allow smarter logic such as replacing thread name with currently executing HTTP request's URL. Such logic might be implemented by maintaining a `ConcurrentHashMap<Thread,String>` and using it for lookups. Such logic 
+You may write your own thread name manipulator to allow smarter logic such as replacing thread name with currently executing HTTP request's URL. Such logic might be implemented by maintaining a `ConcurrentHashMap<Thread,String>` and using it for lookups. Alternatively, such logic might be implemented by modifying your application to set thread name as the currently executing URL, User, or anything you like.
+
+In most cases, you are interested in your application code only. E.g. when your code invokes `java.sql.Connection.executeQuery()` interface, a method of the JDBC driver is called. it might called several other methods until the actual wait for DB response. These methods are not interesting. So, the sampler will pile all the cumulative time of executeQuery as if it's "Method time".
+
+You should specify a list of package prefixes that will be considered as "interesting". Whenever the top method in the stack trace not an interesting one, the next methods will be checked until an interesting one is found. 
+
+Additional 
