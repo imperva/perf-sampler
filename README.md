@@ -1,13 +1,16 @@
 # Production grade JAVA performance sampler
 A light weight JAVA performance tool. Its sampling technique allows 24x7 performance monitoring in production with negligible and predicted overhead.
 
+It allows to pinpoint which methods and lines of code consume most of your application's time without the overhead and intrusion of byte code instrumentation.
+
 ### A bit on sampling theory
 This sampler does not measure the amount of executions and duration of each and every method. That would dramatically impact the resposiveness of your application. 
 
 To allow 24x7 performance monitoring in production environment, a sampler is a much better fit. Its overhead is much lower, predictable and controlable.
-It periodically takes a snapshot of all JAVA threads using `Thread.getAllStackTraces()` call. Let's say sampling frequency is once every 50ms. Then, the current active method and line of code is counted as responsible for the entire period (50ms). This is done for each thread and aggregated over time.
+It periodically takes a snapshot of all JAVA threads using `Thread.getAllStackTraces()` call. 
+Let's say sampling frequency is once every 50ms. The sampler will count the top stack trace entry (package, class, method, and line number) as responsible for the entire period (50ms). This is done for each thread and aggregated over time.
 
-Of course, not all the accounted time was actually spent that arbirary method. However, if you sample your thread for 50 seconds (1000 samples once every 50ms) and a specific method was reported as current in 200 different samples, then it's safe to say that this method is responsible for 20% of the elapsed time (or 10 seconds) of that thread.
+The sampler assume the entire sampling period was spent on a single method and line number. When focusing on each individual sample, this assumption is of course wrong. However, if you sample your thread for 50 seconds (1000 samples once every 50ms) and a specific method was reported as current in 200 different samples, then it's safe to say that this method is responsible for 20% of the elapsed time (or 10 seconds) of that thread.
 
 Sampling overhead linearly depends on sampling frequency. Intuitively, you should expect accuracy to be impacted when frequency is lowered. In practice, accuracy depends solely on the amount of samples. 1000 samples are more than enough for most use cases. So, lowering sampling does not impact accuracy. It just takes more time to have enough samples.
 
@@ -18,7 +21,7 @@ What sampling cannot tell is how many times a method was invoked. In the above e
 - Executed once for 10 consecutive seconds.
 
 ### Aggregation and reporting
-Taking a snapshot of all threads is pretty easy. Making sense of the data and reporting it in a concise manner to easilly pinpointing the performance problems is the core logic of this sampler.
+Taking a snapshot of all threads is pretty easy. Making sense of the data and reporting it in a concise manner to easily pinpointing the performance problems is the core logic of this sampler.
 
 Each method in the stack trace have two counters:
 - **Cumulative time** - How much time was spent inside that method **including** time spent on its called methods.
