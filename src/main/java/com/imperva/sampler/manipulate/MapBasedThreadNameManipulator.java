@@ -1,4 +1,4 @@
-package com.incapsula.sampler.manipulate;
+package com.imperva.sampler.manipulate;
 
 import java.util.concurrent.ConcurrentHashMap;
 

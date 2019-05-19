@@ -1,4 +1,4 @@
-package com.incapsula.sampler.outputer;
+package com.imperva.sampler.outputer;
 
 import java.io.File;
 import java.io.PrintStream;

@@ -1,9 +1,4 @@
-package com.incapsula.sampler;
-
-import com.incapsula.sampler.manipulate.RegexThreadNameManipulator;
-import com.incapsula.sampler.manipulate.ThreadNameManipulator;
-import com.incapsula.sampler.outputer.PrintStreamSamplingOutputer;
-import com.incapsula.sampler.outputer.SamplingOutputer;
+package com.imperva.sampler;
 
 import java.io.IOException;
 import java.util.Date;
@@ -14,6 +9,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.imperva.sampler.manipulate.RegexThreadNameManipulator;
+import com.imperva.sampler.manipulate.ThreadNameManipulator;
+import com.imperva.sampler.outputer.PrintStreamSamplingOutputer;
+import com.imperva.sampler.outputer.SamplingOutputer;
 
 
 public class ThreadsSampler implements Runnable, AutoCloseable

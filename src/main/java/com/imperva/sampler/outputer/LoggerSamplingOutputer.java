@@ -1,4 +1,4 @@
-package com.incapsula.sampler.outputer;
+package com.imperva.sampler.outputer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

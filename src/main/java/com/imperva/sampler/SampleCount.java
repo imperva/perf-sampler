@@ -1,4 +1,4 @@
-package com.incapsula.sampler;
+package com.imperva.sampler;
 
 public class SampleCount {
 
