@@ -1,0 +1,21 @@
+language: java
+jdk:
+- oraclejdk8
+install: true
+stages:
+- name: build
+- name: publish-snapshot
+  if: branch = master AND type IN (push)
+- name: publish-release
+  if: branch  =~ ^release\/.*$ AND type IN (push)
+jobs:
+  include:
+  - stage: build
+    script: mvn -f pom.xml install
+  - stage: publish-snapshot
+    script: mvn --settings .travis.settings.xml -f pom.xml deploy
+  - stage: publish-release
+    script: mvn --settings .travis.settings.xml -f pom.xml deploy
+cache:
+  directories:
+  - "$HOME/.m2"
