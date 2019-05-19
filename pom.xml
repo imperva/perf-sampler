@@ -5,7 +5,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <groupId>com.imperva.sampler</groupId>
   <artifactId>perf-sampler</artifactId>
   <version>1.0.0</version>
-	<name>perf-sampler</name>
+  <name>perf-sampler</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	  <bintray.repo>imperva.opensource.maven.repository</bintray.repo>
