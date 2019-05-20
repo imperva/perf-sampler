@@ -5,7 +5,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <groupId>com.imperva.sampler</groupId>
   <artifactId>perf-sampler</artifactId>
   <version>1.0.0</version>
-  <name>perf-sampler</name>
+  <name>Perf Sampler</name>
+	<description>
+		A light weight JAVA performance tool. Its sampling technique allows 24x7 performance monitoring in production with negligible and predicted overhead.
+	</description>
+	<url>https://github.com/imperva/perf-sampler.git</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	  <bintray.repo>imperva.opensource.maven.repository</bintray.repo>
@@ -72,6 +76,20 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	    <version>1.7.26</version>
 	</dependency>
   </dependencies>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Ehud Eshet</name>
+			<email>ehud.eshet@imperva.com</email>
+			<organization>Imperva</organization>
+			<organizationUrl>http://www.imperva.com</organizationUrl>
+		</developer>
+	</developers>
 	<scm>
 		<connection>scm:git:git://github.com/imperva/perf-sampler.git</connection>
 		<developerConnection>scm:git:ssh://github.com:imperva/perf-sampler.git</developerConnection>
