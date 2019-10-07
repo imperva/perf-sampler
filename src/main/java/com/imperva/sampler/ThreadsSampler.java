@@ -21,7 +21,7 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 	private volatile boolean m_continue = true;
 	private volatile boolean m_printRequested = false;
 	private long m_sleepBetweenSamplesInMillis = 100L;
-	private String[] m_packagePrefixes = {"com.imperva.", "com.mprv."};
+	private String[] m_packagePrefixes;
 	private final HashMap<String, ThreadGroupSamples> m_samplingMap = new HashMap<>();
 	private long m_reportIntervalMillis = 900000L;
 	private volatile long lastReportAt = System.currentTimeMillis();
@@ -87,6 +87,8 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 	
 	public void init() 
 	{
+		checkConfig();
+
 		if (threadNameManipulator == null) {
 			threadNameManipulator = new RegexThreadNameManipulator();
 		}
@@ -108,7 +110,14 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 			}
 		} catch (InterruptedException e) {}
 	}
-		
+
+	private void checkConfig() {
+		if(m_packagePrefixes == null || m_packagePrefixes.length == 0) {
+			String err = "MonitoredPackages are required. Please specify a comma delimited string with the name of packages to sample. i.e. 'com.imperva.,com.impv.' ";
+			throw new RuntimeException(err);
+		}
+	}
+
 	@Override
 	public void run() 
 	{
