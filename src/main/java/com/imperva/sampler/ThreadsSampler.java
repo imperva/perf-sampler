@@ -1,12 +1,7 @@
 package com.imperva.sampler;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,17 +24,17 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 	private SamplingOutputer outputer = null;
 	private volatile boolean isActive = true, isStarted = false;
 	private volatile boolean isSampleOnceAndPrint = false;
-	private Pattern commaSplitter = Pattern.compile(",");
+	private static final Pattern commaSplitter = Pattern.compile(",");
 	private boolean skipDaemonThreads = true;
 	private Thread samplerThread = null;
-	private HashSet<Thread> sampleTheseThreadOnly = new HashSet<>();
+	private final HashSet<Thread> sampleTheseThreadOnly = new HashSet<>();
 	private boolean isReportZeroTimePackages = false;
 	private volatile boolean isEmptySamplingMap = true;
 
 	private long prevTime;
 	private long sampleDuration;
 	
-	private static Pattern digitsRemover = Pattern.compile("\\d+");
+	private static final Pattern digitsRemover = Pattern.compile("\\d+");
 	
 	public void setSamplingFrequencyMillis(long frequencyInMillis) {
 		m_sleepBetweenSamplesInMillis = frequencyInMillis;
@@ -129,7 +124,7 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 		printReportNow();
 	}
 
-	private void processLoop() throws Exception{
+	private void processLoop() {
 
 		if (m_sleepBetweenSamplesInMillis > sampleDuration)
 		{
@@ -190,7 +185,16 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 	
 	private void sampleOnce(long duration)
 	{
-		for (Map.Entry<Thread, StackTraceElement[]> threadEntry : Thread.getAllStackTraces().entrySet())
+		HashMap<Thread, StackTraceElement[]> sampledThreadsMap = null;
+		if (sampleTheseThreadOnly.size() > 0) {
+			sampledThreadsMap = new HashMap<>(sampleTheseThreadOnly.size() * 3);
+			for (Thread toBeSampled : sampleTheseThreadOnly) {
+				sampledThreadsMap.put(toBeSampled, toBeSampled.getStackTrace());
+			}
+		}
+		Collection<Map.Entry<Thread, StackTraceElement[]>> threadEntries = sampleTheseThreadOnly.size() > 0 ?
+				sampledThreadsMap.entrySet() : Thread.getAllStackTraces().entrySet();
+		for (Map.Entry<Thread, StackTraceElement[]> threadEntry : threadEntries)
 		{
 			Thread sampledThread = threadEntry.getKey();
 			if (sampleTheseThreadOnly.size() > 0 && ! sampleTheseThreadOnly.contains(sampledThread)) {
@@ -253,7 +257,7 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 					threadGroupSamples.samplingMap.put(methodKey, count);
 				}
 
-				count.increment(duration, i == deepestIndex);;
+				count.increment(duration, i == deepestIndex);
 			}
 		}
 
@@ -299,7 +303,7 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 		m_printRequested = true;
 	}
 
-	private static Pattern packagePattern = Pattern.compile("([a-z]+\\.([a-z]+|)).*");
+	private static final Pattern packagePattern = Pattern.compile("([a-z]+\\.([a-z]+|)).*");
 
 	private synchronized void printReportNow()
 	{
@@ -315,7 +319,7 @@ public class ThreadsSampler implements Runnable, AutoCloseable
 		{
 			ThreadGroupSamples  tgs = aggregatedThread.getValue();
 			String threadTitle = "Aggregated thread: " + aggregatedThread.getKey() + ". Max depth: " + tgs.maxDepth +
-					". Distinct threads: " + tgs.threadNamesMap.size() + " " + tgs.threadNamesMap.values().toString();
+					". Distinct threads: " + tgs.threadNamesMap.size() + " " + tgs.threadNamesMap.values();
 			StringBuilder sb = new StringBuilder();
 			
 			TreeMap<String, SampleCount> methodsMap = tgs.samplingMap;
